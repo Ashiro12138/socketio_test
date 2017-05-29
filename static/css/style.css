@@ -131,3 +131,11 @@ aside li {
 footer {
   margin-top: 10px;
 }
+
+div#wrapper {
+    overflow:hidden;
+    overflow-y: scroll;
+	word-wrap: break-word;
+	width: 808.75px;
+    height: 341px; // change this to desired height
+}

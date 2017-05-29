@@ -5,6 +5,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -14,6 +15,8 @@ def login():
     if request.method == 'POST':
         if request.form['username']:
             session['username'] = request.form['username'][:20]
+            session['username'] = session['username'].replace("&","&amp;").replace("\"","&quot;").replace("\'","&quot;").replace("<","&lt;").replace(">","&gt;")
+            session['namecheck'] = 0
             return redirect(url_for('index'))
         else:
             flash("Please enter a valid username")
@@ -28,16 +31,22 @@ def logout():
 
 @app.route('/chat')
 def chat():
-    return render_template('chat.html')
-
+	if 'username' in session:
+		return render_template('chat.html')
+	else:
+		return redirect(url_for("login"))
 @socketio.on('message')
 def handleMessage(msg):
     if 'username' in session:
+        newname = session['username'].replace("&","&amp;").replace("\"","&quot;").replace("\'","&quot;").replace("<","&lt;").replace(">","&gt;")
+        session['namecheck'] = 1
         print(session['username'])
     else:
         print('nothing')
-    print('Message: ' + msg[:200])
-    send(session['username']+": "+msg[:200], broadcast=True)
+    newmsg = msg[:200]
+    newmsg = newmsg.replace("&","&amp;").replace("\"","&quot;").replace("\'","&quot;").replace("<","&lt;").replace(">","&gt;")
+    print('Message: ' + newmsg)
+    send(newname+": "+newmsg, broadcast=True)
 
 
 if __name__ == '__main__':
