@@ -14,6 +14,16 @@ def index():
 def login():
     if request.method == 'POST':
         if request.form['username']:
+            check = 0
+            for i in request.form['username']:
+                if i in ["&","\"","\'","<",">"]:
+                    check = 1
+                    break
+            if check:
+                flash("Please enter a valid username")
+                flash("That does not include the following special charcters:")
+                flash("&,\",\',< and >")
+                return render_template('login.html')
             session['username'] = request.form['username'][:20]
             session['username'] = session['username'].replace("&","&amp;").replace("\"","&quot;").replace("\'","&quot;").replace("<","&lt;").replace(">","&gt;")
             session['namecheck'] = 0
